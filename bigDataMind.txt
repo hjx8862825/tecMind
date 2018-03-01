@@ -1,0 +1,80 @@
+1	----------------------
+基础准备(修改主机名,分配用户组,软件,jdk等)
+2	----------------------
+ssh免密登录
+ssh-keygen -t rsa 把生成key分发至各集群
+scp 路径 用户@地址:路径 ---远程复制 dir -r
+
+3	----------------------
+时间同步--各种方式
+
+4	----------------------
+ZK
+
+##完成之后搭建kafka集群----------->
+
+
+
+
+5	----------------------
+hadoop安装配置
+修改各类配置文件
+##启动jurnalnode >>> hadoop-daemons.sh start journalnode
+##格式化zkfc,让在zookeeper中生成ha节点 hdfs zkfc –formatZK (ls /hadoop-ha)检查
+	返回[ns]
+## 格式化hdfs hadoop namenode –format
+##启动NameNode hadoop-daemon.sh start namenode
+##把NameNode的数据同步到mast2上
+[hadoop@Mast2 hadoop-2.5.2]$ hdfs namenode –bootstrapStandby
+##启动mast2上的namenode作为standby
+[hadoop@Mast2 hadoop-2.5.2]$ sbin/hadoop-daemon.sh start namenode
+
+(大启动完成后去第二个namenode中把其作为stanby,并启动)
+
+首次稍有不同:1>启动所有节点zk
+			 2>启动所有节点journalnode
+			 3>主节点format namenode并启动
+			 4>把主节点的format后的文件name scp到备用节点
+			 5>备用namenode节点hdfs namenode -boostrapStanby(表示作为备份把主节点的name文件copy过来---启动备份namenode)
+			 6>两个namenode节点执行hadoop-daemon.sh start zkfc
+			 7>所有datanode节点启动datanode
+
+6	----------------------
+Spark
+##搭建Scala环境
+export SCALA_HOME=/data/install/scala-2.12.2
+export PATH=$PATH:$SCALA_HOME/bin
+
+##配置spark
+
+
+7	----------------------
+hive
+##安装mysql  记录密码:%N;DD7UQm*Fo
+flush privileges
+创建hive数据库 进入设置编码为latin1 -->alter database hive character set latin1
+
+##
+修改各类配置文件
+配置profile环境变量
+*把hive的jline的jar换成和hadoop一致的
+将mysql-connector-java-5.1.25-bin.jar连接jar拷贝到hive-1.2.0/lib目录下
+***!!!首次初始化hive执行如下命令(mysql)来生成元数据./schematool -dbType mysql -initSchema
+
+
+
+8	----------------------
+Hbase
+
+zookeeper->hadoop->spark
+
+
+
+启动顺序:
+hdfs--->yarn---->
+JAVA_OPTS='-Xms4096m -Xmx16384m'
+
+
+
+java测试spark集群:------------------------>
+先把文件上传至hdfs
