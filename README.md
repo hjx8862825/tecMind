@@ -1,2 +1,2 @@
-# tensorflowMind
-tensorflow源码编译流程
+# tecMind
+此项目主要记录各类工具或技术安装或实现流程
